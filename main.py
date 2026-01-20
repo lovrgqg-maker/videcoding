@@ -342,7 +342,7 @@ with col_r:
         st.write(f"**왜 이 활동이 좋을까요?** {a.why} 🙂")
         with st.expander("바로 하기 체크리스트 ✅"):
         for s in a.steps:
-        st.write(f"- {s}")
+            st.write(f"- {s}")
         st.markdown("<div class='hr'></div>", unsafe_allow_html=True)
 
         st.info(
