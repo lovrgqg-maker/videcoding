@@ -97,11 +97,11 @@ st.write("")
 col1, col2 = st.columns([1, 2], vertical_alignment="center")
 
 with col1:
-    img_path = Path("C:\김무원\부업\블로그\사진")
+    img_path = Path("https://share.google/S3mLVgs7ZZTXe7g5p")
     if img_path.exists():
         st.image(str(img_path), caption="Profile Photo", use_container_width=True)
     else:
-        st.warning("C:\김무원\부업\블로그\사진")
+        st.warning("https://share.google/S3mLVgs7ZZTXe7g5p")
 
 with col2:
     st.markdown(
