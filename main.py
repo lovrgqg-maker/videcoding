@@ -343,7 +343,7 @@ with col_r:
             with st.expander("바로 하기 체크리스트 ✅"):
                 for s in a.steps:
                     st.write(f"- {s}")
-            st.markdown("<div class='hr'></div>", unsafe_allow_html=True)
+        st.markdown("<div class='hr'></div>", unsafe_allow_html=True)
 
         st.info(
             "💡 팁: 추천은 ‘지금의 상태’를 기준으로 한 가이드입니다. "
