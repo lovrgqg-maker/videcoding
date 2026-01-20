@@ -21,16 +21,8 @@ CSS = """
   background: linear-gradient(135deg, #0B1220 0%, #0E1A2E 55%, #0B1220 100%);
   color: rgba(255,255,255,0.92);
 }
-
-h1, h2, h3 {
-  letter-spacing: 0.2px;
-}
-
-.small-muted {
-  opacity: 0.78;
-  font-size: 0.95rem;
-}
-
+h1, h2, h3 { letter-spacing: 0.2px; }
+.small-muted { opacity: 0.78; font-size: 0.95rem; }
 .card {
   background: rgba(255,255,255,0.07);
   border: 1px solid rgba(255,255,255,0.14);
@@ -39,7 +31,6 @@ h1, h2, h3 {
   box-shadow: 0 14px 42px rgba(0,0,0,0.35);
   backdrop-filter: blur(10px);
 }
-
 .pill {
   display: inline-block;
   padding: 6px 10px;
@@ -50,14 +41,7 @@ h1, h2, h3 {
   margin-right: 8px;
   margin-bottom: 8px;
 }
-
-.hr {
-  height: 1px;
-  background: rgba(255,255,255,0.12);
-  margin: 14px 0;
-  border-radius: 999px;
-}
-
+.hr { height: 1px; background: rgba(255,255,255,0.12); margin: 14px 0; border-radius: 999px; }
 div.stButton > button {
   border-radius: 14px !important;
   padding: 0.85rem 1.1rem !important;
@@ -66,27 +50,24 @@ div.stButton > button {
   background: rgba(255,255,255,0.10) !important;
   color: rgba(255,255,255,0.92) !important;
 }
-
 div.stButton > button:hover {
   background: rgba(255,255,255,0.16) !important;
   transform: translateY(-1px);
 }
-
 div[data-baseweb="select"] > div {
   border-radius: 14px;
   background: rgba(255,255,255,0.06) !important;
   border: 1px solid rgba(255,255,255,0.14) !important;
 }
-
-.metric {
-  font-size: 2.2rem;
-  font-weight: 900;
-  line-height: 1.0;
-}
-
-.metric-label {
-  opacity: 0.8;
-  margin-top: 6px;
+.metric { font-size: 2.2rem; font-weight: 900; line-height: 1.0; }
+.metric-label { opacity: 0.8; margin-top: 6px; }
+.step {
+  font-weight: 800;
+  padding: 8px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  display: inline-block;
 }
 </style>
 """
@@ -105,9 +86,8 @@ class Activity:
     why: str
     steps: List[str]
 
-
 # -----------------------------
-# Activity Library (추천 데이터)
+# Activity Library
 # -----------------------------
 ACTIVITIES: List[Activity] = [
     Activity(
@@ -188,26 +168,15 @@ ACTIVITIES: List[Activity] = [
 # Scoring Logic
 # -----------------------------
 def mood_badges(valence: int, arousal: int) -> Tuple[str, List[str]]:
-    """
-    valence: -5(매우 부정) ~ +5(매우 긍정)
-    arousal:  0(매우 차분) ~ 10(매우 각성)
-    """
     if valence <= -2 and arousal >= 7:
-        label = "불안/초조 😵‍💫"
-        tags = ["불안", "스트레스", "초조", "걱정"]
-    elif valence <= -2 and arousal <= 4:
-        label = "우울/무기력 🌧️"
-        tags = ["우울", "무기력", "회복", "리듬"]
-    elif valence >= 2 and arousal >= 7:
-        label = "신남/고에너지 ✨🔥"
-        tags = ["집중", "도전", "성과"]
-    elif valence >= 2 and arousal <= 4:
-        label = "평온/만족 🌿🙂"
-        tags = ["회복", "정리", "리듬"]
-    else:
-        label = "복합/보통 😶‍🌫️"
-        tags = ["정리", "집중", "회복"]
-    return label, tags
+        return "불안/초조 😵‍💫", ["불안", "스트레스", "초조", "걱정"]
+    if valence <= -2 and arousal <= 4:
+        return "우울/무기력 🌧️", ["우울", "무기력", "회복", "리듬"]
+    if valence >= 2 and arousal >= 7:
+        return "신남/고에너지 ✨🔥", ["집중", "도전", "성과"]
+    if valence >= 2 and arousal <= 4:
+        return "평온/만족 🌿🙂", ["회복", "정리", "리듬"]
+    return "복합/보통 😶‍🌫️", ["정리", "집중", "회복"]
 
 
 def recommend(valence: int, arousal: int, focus: str, time_cap: str, style: str) -> List[Activity]:
@@ -218,7 +187,6 @@ def recommend(valence: int, arousal: int, focus: str, time_cap: str, style: str)
         "보통(15~25분) 🕒": ["15~25분", "25분", "12~20분"],
         "여유(30분+) 🌙": ["15~30분", "25분", "15~25분"],
     }
-
     intensity_allow = {
         "부드럽게 🌿": ["Low", "Medium"],
         "상관없음 🎛️": ["Low", "Medium", "High"],
@@ -228,15 +196,11 @@ def recommend(valence: int, arousal: int, focus: str, time_cap: str, style: str)
     scored = []
     for a in ACTIVITIES:
         score = 0
-
         score += 3 * len(set(a.tags) & set(mood_tags))
-
         if focus in a.tags:
             score += 5
-
         if any(t in a.duration for t in time_ok.get(time_cap, [])):
             score += 2
-
         if a.intensity in intensity_allow.get(style, ["Low", "Medium", "High"]):
             score += 1
         else:
@@ -256,110 +220,194 @@ def recommend(valence: int, arousal: int, focus: str, time_cap: str, style: str)
 
 
 # -----------------------------
+# Step State
+# -----------------------------
+if "step" not in st.session_state:
+    st.session_state.step = 1
+
+if "valence" not in st.session_state:
+    st.session_state.valence = 0
+if "arousal" not in st.session_state:
+    st.session_state.arousal = 5
+if "focus" not in st.session_state:
+    st.session_state.focus = "회복"
+if "time_cap" not in st.session_state:
+    st.session_state.time_cap = "보통(15~25분) 🕒"
+if "style" not in st.session_state:
+    st.session_state.style = "부드럽게 🌿"
+
+def goto(step: int) -> None:
+    st.session_state.step = step
+
+def reset_all() -> None:
+    st.session_state.step = 1
+    st.session_state.valence = 0
+    st.session_state.arousal = 5
+    st.session_state.focus = "회복"
+    st.session_state.time_cap = "보통(15~25분) 🕒"
+    st.session_state.style = "부드럽게 🌿"
+
+
+# -----------------------------
 # Header
 # -----------------------------
 st.markdown("# 오늘의 마음 추천 🌿🫧")
 st.markdown(
-    f"<div class='small-muted'>📅 {date.today().isoformat()} · 오늘의 감정 상태를 체크하고, 지금 나에게 맞는 활동을 추천받아보세요 🙂</div>",
+    f"<div class='small-muted'>📅 {date.today().isoformat()} · 감정 체크 → 컨디션 입력 → 활동 추천 순서로 진행됩니다 🙂</div>",
     unsafe_allow_html=True,
 )
+st.write("")
 
-col_l, col_r = st.columns([1.05, 1.0], gap="large")
+step_label = {1: "1단계 · 감정 체크 🙂", 2: "2단계 · 컨디션 입력 🎛️", 3: "3단계 · 활동 추천 🎁"}[st.session_state.step]
+st.markdown(f"<span class='step'>{step_label}</span>", unsafe_allow_html=True)
+st.write("")
 
 # -----------------------------
-# Left: Inputs
+# Step 1: Emotion Check
 # -----------------------------
-with col_l:
+if st.session_state.step == 1:
     st.markdown("<div class='card'>", unsafe_allow_html=True)
     st.subheader("감정 체크 ✅")
 
     st.markdown("**1) 기분(긍정/부정)** 🙂↔️😞")
-    valence = st.slider("지금 기분은 어떤가요?", -5, 5, 0, help="부정(-) ~ 긍정(+)")
+    st.session_state.valence = st.slider(
+        "지금 기분은 어떤가요?",
+        -5, 5, st.session_state.valence,
+        help="부정(-) ~ 긍정(+)",
+    )
 
     st.markdown("**2) 각성도(에너지/긴장)** 🫨↔️🧘")
-    arousal = st.slider("몸과 마음의 에너지는 어느 정도인가요?", 0, 10, 5, help="0: 매우 차분 · 10: 매우 각성")
+    st.session_state.arousal = st.slider(
+        "몸과 마음의 에너지는 어느 정도인가요?",
+        0, 10, st.session_state.arousal,
+        help="0: 매우 차분 · 10: 매우 각성",
+    )
 
+    label, mood_tags = mood_badges(st.session_state.valence, st.session_state.arousal)
     st.markdown("<div class='hr'></div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='metric'>{label}</div>", unsafe_allow_html=True)
+    st.markdown("".join([f"<span class='pill'>#{t} 🏷️</span>" for t in mood_tags]), unsafe_allow_html=True)
 
-    st.subheader("컨디션 옵션 🎛️")
-    focus = st.selectbox(
-        "지금 가장 필요한 것은? 🎯",
-        ["회복", "집중", "정리", "불안", "무기력", "스트레스", "리듬", "짜증", "걱정", "피곤"],
-        index=0,
-    )
+    st.write("")
+    c1, c2 = st.columns([1, 1])
+    with c1:
+        if st.button("다음 단계로 ➡️", use_container_width=True):
+            goto(2)
+    with c2:
+        if st.button("초기화 🔄", use_container_width=True):
+            reset_all()
 
-    time_cap = st.selectbox(
-        "가능한 시간은? ⏳",
-        ["짧게(5~10분) ⏱️", "보통(15~25분) 🕒", "여유(30분+) 🌙"],
-        index=1,
-    )
-
-    style = st.selectbox(
-        "원하는 강도는? 🌡️",
-        ["부드럽게 🌿", "상관없음 🎛️", "확실하게(강하게) 🔥"],
-        index=0,
-    )
-
-    go = st.button("추천 받기 ✨", use_container_width=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
 # -----------------------------
-# Right: Results
+# Step 2: Condition Input
 # -----------------------------
-with col_r:
+elif st.session_state.step == 2:
     st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.subheader("추천 결과 🎁")
+    st.subheader("컨디션 옵션 🎛️")
 
-    label, mood_tags = mood_badges(valence, arousal)
+    label, mood_tags = mood_badges(st.session_state.valence, st.session_state.arousal)
+    st.markdown(f"<div class='small-muted'>현재 상태: <b>{label}</b></div>", unsafe_allow_html=True)
+    st.markdown("".join([f"<span class='pill'>#{t} 🏷️</span>" for t in mood_tags]), unsafe_allow_html=True)
 
-    st.markdown(f"<div class='metric'>{label}</div>", unsafe_allow_html=True)
-    st.markdown("<div class='metric-label'>오늘의 상태 요약 🧾</div>", unsafe_allow_html=True)
+    st.markdown("<div class='hr'></div>", unsafe_allow_html=True)
+
+    st.session_state.focus = st.selectbox(
+        "지금 가장 필요한 것은? 🎯",
+        ["회복", "집중", "정리", "불안", "무기력", "스트레스", "리듬", "짜증", "걱정", "피곤"],
+        index=["회복", "집중", "정리", "불안", "무기력", "스트레스", "리듬", "짜증", "걱정", "피곤"].index(st.session_state.focus),
+    )
+
+    st.session_state.time_cap = st.selectbox(
+        "가능한 시간은? ⏳",
+        ["짧게(5~10분) ⏱️", "보통(15~25분) 🕒", "여유(30분+) 🌙"],
+        index=["짧게(5~10분) ⏱️", "보통(15~25분) 🕒", "여유(30분+) 🌙"].index(st.session_state.time_cap),
+    )
+
+    st.session_state.style = st.selectbox(
+        "원하는 강도는? 🌡️",
+        ["부드럽게 🌿", "상관없음 🎛️", "확실하게(강하게) 🔥"],
+        index=["부드럽게 🌿", "상관없음 🎛️", "확실하게(강하게) 🔥"].index(st.session_state.style),
+    )
 
     st.write("")
+    c1, c2, c3 = st.columns([1, 1, 1])
+    with c1:
+        if st.button("⬅️ 이전 단계", use_container_width=True):
+            goto(1)
+    with c2:
+        if st.button("추천 보기 🎁", use_container_width=True):
+            goto(3)
+    with c3:
+        if st.button("초기화 🔄", use_container_width=True):
+            reset_all()
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# -----------------------------
+# Step 3: Recommendation
+# -----------------------------
+else:
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    st.subheader("활동 추천 🎁")
+
+    label, mood_tags = mood_badges(st.session_state.valence, st.session_state.arousal)
+    st.markdown(f"<div class='metric'>{label}</div>", unsafe_allow_html=True)
+    st.markdown("<div class='metric-label'>오늘의 상태 요약 🧾</div>", unsafe_allow_html=True)
     st.markdown("".join([f"<span class='pill'>#{t} 🏷️</span>" for t in mood_tags]), unsafe_allow_html=True)
     st.markdown("<div class='hr'></div>", unsafe_allow_html=True)
 
-    if not go:
-        st.markdown(
-            "<div class='small-muted'>왼쪽에서 슬라이더와 옵션을 설정한 뒤, <b>추천 받기</b>를 눌러주세요 🙂✨</div>",
-            unsafe_allow_html=True,
+    recs = recommend(
+        st.session_state.valence,
+        st.session_state.arousal,
+        st.session_state.focus,
+        st.session_state.time_cap,
+        st.session_state.style,
+    )
+
+    st.markdown("### 지금 추천하는 활동 TOP 5 🌟")
+
+    for idx, a in enumerate(recs, start=1):
+        st.markdown(f"#### {idx}. {a.emoji} {a.title}")
+
+        tags_html = "".join(f"<span class='pill'>#{t}</span>" for t in a.tags)
+        html = (
+            f"<span class='pill'>⏱️ {a.duration}</span>"
+            f"<span class='pill'>🌡️ {a.intensity}</span>"
+            f"{tags_html}"
         )
-    else:
-        recs = recommend(valence, arousal, focus, time_cap, style)
+        st.markdown(html, unsafe_allow_html=True)
 
-        st.markdown("### 지금 추천하는 활동 TOP 5 🌟")
+        st.write(f"**왜 이 활동이 좋을까요?** {a.why} 🙂")
 
-        for idx, a in enumerate(recs, start=1):
-            st.markdown(f"#### {idx}. {a.emoji} {a.title}")
+        with st.expander("바로 하기 체크리스트 ✅"):
+            for s in a.steps:
+                st.write(f"- {s}")
 
-            tags_html = "".join(f"<span class='pill'>#{t}</span>" for t in a.tags)
-            html = (
-                f"<span class='pill'>⏱️ {a.duration}</span>"
-                f"<span class='pill'>🌡️ {a.intensity}</span>"
-                f"{tags_html}"
-            )
-            st.markdown(html, unsafe_allow_html=True)
+        st.markdown("<div class='hr'></div>", unsafe_allow_html=True)
 
-            st.write(f"**왜 이 활동이 좋을까요?** {a.why} 🙂")
+    st.info(
+        "💡 팁: 추천은 ‘지금의 상태’를 기준으로 한 가이드입니다. "
+        "너무 힘들거나 위험하다고 느껴지면, 휴식이나 주변 도움을 우선해 주세요 🫶"
+    )
 
-            with st.expander("바로 하기 체크리스트 ✅"):
-                for s in a.steps:
-                    st.write(f"- {s}")
-
-            st.markdown("<div class='hr'></div>", unsafe_allow_html=True)
-
-        st.info(
-            "💡 팁: 추천은 ‘지금의 상태’를 기준으로 한 가이드입니다. "
-            "너무 힘들거나 위험하다고 느껴지면, 휴식/주변 도움을 우선해 주세요 🫶"
-        )
+    c1, c2, c3 = st.columns([1, 1, 1])
+    with c1:
+        if st.button("⬅️ 컨디션 수정", use_container_width=True):
+            goto(2)
+    with c2:
+        if st.button("감정부터 다시 🙂", use_container_width=True):
+            goto(1)
+    with c3:
+        if st.button("전체 초기화 🔄", use_container_width=True):
+            reset_all()
 
     st.markdown("</div>", unsafe_allow_html=True)
 
 # -----------------------------
-# Optional: 기록(세션 메모리) - 간단 버전
+# Optional: 기록(세션 메모리) - 단계와 무관하게 하단에 배치
 # -----------------------------
 st.markdown("")
-
 with st.expander("🗂️ 오늘 기록 남기기 (선택)"):
     st.markdown("<div class='card'>", unsafe_allow_html=True)
     note = st.text_area("오늘의 한 줄 메모 ✍️", placeholder="예: 업무가 많아서 긴장됐지만 산책하니 조금 나아졌어 🙂")
