@@ -101,7 +101,7 @@ with col1:
     if img_path.exists():
         st.image(str(img_path), caption="Profile Photo", use_container_width=True)
     else:
-        st.warning("assets/profile.jpg 파일을 추가하면 사진이 표시됩니다.")
+        st.warning("C:\김무원\부업\블로그\사진")
 
 with col2:
     st.markdown(
