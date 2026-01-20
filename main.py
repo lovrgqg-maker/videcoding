@@ -332,11 +332,12 @@ with col_r:
         st.markdown("### 지금 추천하는 활동 TOP 5 🌟")
         for idx, a in enumerate(recs, 1):
             st.markdown(f"#### {idx}. {a.emoji} {a.title}")
-            st.markdown(
-                f"<span class='pill'>⏱️ {a.duration}</span>"
-                f"<span class='pill'>🌡️ {a.intensity}</span>"
-                f"{''.join([f\"<span class='pill'>#{t}</span>\" for t in a.tags])}",
-                unsafe_allow_html=True
+        tags_html = "".join([f"<span class='pill'>#{t}</span>" for t in a.tags])
+
+        st.markdown(
+            f"<span class='pill'>⏱️ {a.duration}</span>"
+            f"<span class='pill'>🌡️ {a.intensity}</span>"
+            f"{tags_html}",
             )
             st.write(f"**왜 이 활동이 좋을까요?** {a.why} 🙂")
             with st.expander("바로 하기 체크리스트 ✅"):
