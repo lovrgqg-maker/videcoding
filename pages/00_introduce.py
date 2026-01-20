@@ -59,7 +59,7 @@ st.markdown(
 # -----------------------------
 # Content (Edit here)
 # -----------------------------
-NAME = "홍길동"
+NAME = "김무원"
 ROLE = "환경/데이터 기반 문제 해결에 관심 있는 직장인"
 GREETING = "안녕하세요! 제 프로필 페이지에 오신 것을 환영합니다."
 ABOUT = (
@@ -71,10 +71,9 @@ TAGS = ["Sustainability", "환경정책", "데이터 분석", "업무 자동화"
 
 # 원하는 링크로 바꾸세요
 LINKS = {
-    "GitHub": "https://github.com/",
-    "LinkedIn": "https://www.linkedin.com/",
-    "Blog": "https://example.com",
-    "Email": "mailto:you@example.com",
+    "LinkedIn": "https://www.linkedin.com/in/muwon-kim-6aa964250/",
+    "Blog": "https://blog.naver.com/env_yuelpapa",
+    "Email": "lovrgqg@gmail.com",
 }
 
 # -----------------------------
@@ -98,7 +97,7 @@ st.write("")
 col1, col2 = st.columns([1, 2], vertical_alignment="center")
 
 with col1:
-    img_path = Path("assets/profile.jpg")
+    img_path = Path("C:\김무원\부업\블로그\사진")
     if img_path.exists():
         st.image(str(img_path), caption="Profile Photo", use_container_width=True)
     else:
